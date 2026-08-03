@@ -1,0 +1,62 @@
+{
+  "checks": [
+    {
+      "dimension": 2,
+      "fpylll_point_count": 21,
+      "independent_point_count": 21,
+      "match": true,
+      "nonzero_sign_orbits": 10,
+      "radius_squared": 5
+    },
+    {
+      "dimension": 3,
+      "fpylll_point_count": 57,
+      "independent_point_count": 57,
+      "match": true,
+      "nonzero_sign_orbits": 28,
+      "radius_squared": 5
+    },
+    {
+      "dimension": 4,
+      "fpylll_point_count": 137,
+      "independent_point_count": 137,
+      "match": true,
+      "nonzero_sign_orbits": 68,
+      "radius_squared": 5
+    }
+  ],
+  "evaluator_strategy": "FIRST_N_SOLUTIONS",
+  "fixed_radius": true,
+  "oblique_projection_check": {
+    "basis_rows": [
+      [
+        1,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        2
+      ]
+    ],
+    "first": 1,
+    "fpylll_point_count": 3,
+    "independent_projected_point_count": 3,
+    "independent_unprojected_point_count": 1,
+    "last": 3,
+    "matches_projection_only": true,
+    "projected_gso_squared_norms": [
+      0.5,
+      4.0
+    ],
+    "radius_squared": 0.75
+  },
+  "sign_convention": "two times nonzero sign orbits plus zero",
+  "solution_budget": 10000000
+}

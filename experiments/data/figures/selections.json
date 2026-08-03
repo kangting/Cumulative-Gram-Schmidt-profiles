@@ -1,0 +1,50 @@
+{
+  "fixed_radius_panels": [
+    {
+      "job_id": "n=40:q=5:t=20:beta=7:seed=2",
+      "measured_peak": 19,
+      "predicted_peak": 19,
+      "rank": 40,
+      "selection_rule": "mean log ratio nearest the rank median"
+    },
+    {
+      "job_id": "n=44:q=47:t=22:beta=8:seed=0",
+      "measured_peak": 20,
+      "predicted_peak": 20,
+      "rank": 44,
+      "selection_rule": "mean log ratio nearest the rank median"
+    }
+  ],
+  "profile_panels": [
+    {
+      "beta": 2,
+      "category": "geometric model wins",
+      "gsa_delta_e": 44.777878888207965,
+      "n": 320,
+      "q": 31,
+      "seed": 9,
+      "t": 160,
+      "zgsa_delta_e": 114.71728537802346
+    },
+    {
+      "beta": 2,
+      "category": "three-zone model wins",
+      "gsa_delta_e": 72.54769420402877,
+      "n": 320,
+      "q": 1031,
+      "seed": 7,
+      "t": 240,
+      "zgsa_delta_e": 1.3876760159765809
+    },
+    {
+      "beta": 2,
+      "category": "geometric model wins narrowly",
+      "gsa_delta_e": 0.876737977373196,
+      "n": 120,
+      "q": 127,
+      "seed": 0,
+      "t": 60,
+      "zgsa_delta_e": 0.8773608300550784
+    }
+  ]
+}

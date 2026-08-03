@@ -1,0 +1,23 @@
+{
+  "bkz_max_loops": 8,
+  "enumeration_strategy": "FIRST_N_SOLUTIONS",
+  "enumeration_time_cap_seconds": 300.0,
+  "float_type": "ld",
+  "fpylll": "0.6.4",
+  "hard_process_timeout_seconds": 1220.0,
+  "max_dist": "GH(Lambda)^2",
+  "max_dist_expo": 0,
+  "node_cap": 100000000,
+  "node_cap_semantics": "post-call threshold; does not interrupt active enumeration",
+  "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.39",
+  "point_count": "2 * len(solutions) + 1",
+  "proxy_comparator": "single-level N_k(R)",
+  "python": "3.12.3",
+  "radius": "GH(Lambda)",
+  "radius_update": "disabled",
+  "reduction_timeout_seconds": 900,
+  "sign_pair_representatives": "one per nonzero pair",
+  "solution_budget": 10000000,
+  "worker_count_default": 8,
+  "zero_included": true
+}

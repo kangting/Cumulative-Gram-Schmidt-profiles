@@ -1,0 +1,87 @@
+{
+  "attempted_ranks": [
+    40,
+    44
+  ],
+  "complete_ranks": [
+    40
+  ],
+  "largest_complete_rank": 40,
+  "primary_complete_rank_summary": {
+    "exact_peak_matches": 72,
+    "geometric_mean_ratio": 1.060975709656121,
+    "instances": 72,
+    "maximum_peak_offset": 0,
+    "mean_absolute_peak_gap": 0.0,
+    "mean_log_ratio": 0.05918896554896883,
+    "mean_peak_offset": 0.0,
+    "measured_pairs": 2880,
+    "median_absolute_peak_gap": 0.0,
+    "median_log_ratio": 7.360901360531358e-05,
+    "minimum_peak_offset": 0,
+    "predicted_bottleneck_passed": 72,
+    "q05_log_ratio": -0.10193079206440725,
+    "q95_log_ratio": 0.33925458936570174,
+    "sd_log_ratio": 0.4261911905445083,
+    "sweep_mean_log_ratio_sd": 0.1326299728118378,
+    "sweep_mean_log_ratio_se": 0.015630592193972993
+  },
+  "rank_summaries": [
+    {
+      "exact_peak_matches": 72,
+      "geometric_mean_ratio": 1.060975709656121,
+      "grid_complete": true,
+      "instances_complete": 72,
+      "instances_total": 72,
+      "maximum_peak_offset": 0,
+      "mean_absolute_peak_gap": 0.0,
+      "mean_log_ratio": 0.05918896554896883,
+      "mean_peak_offset": 0.0,
+      "measured_pairs": 2880,
+      "median_absolute_peak_gap": 0.0,
+      "median_log_ratio": 7.360901360531358e-05,
+      "minimum_peak_offset": 0,
+      "predicted_bottleneck_passed": 72,
+      "q05_log_ratio": -0.10193079206440725,
+      "q95_log_ratio": 0.33925458936570174,
+      "rank": 40,
+      "sd_log_ratio": 0.4261911905445083,
+      "sweep_mean_log_ratio_sd": 0.1326299728118378,
+      "sweep_mean_log_ratio_se": 0.015630592193972993,
+      "terminal_statuses": "{\"ok\": 72}"
+    },
+    {
+      "exact_peak_matches": 21,
+      "geometric_mean_ratio": 1.0837920430816652,
+      "grid_complete": false,
+      "instances_complete": 21,
+      "instances_total": 24,
+      "maximum_peak_offset": 0,
+      "mean_absolute_peak_gap": 0.0,
+      "mean_log_ratio": 0.08046604243780496,
+      "mean_peak_offset": 0.0,
+      "measured_pairs": 924,
+      "median_absolute_peak_gap": 0,
+      "median_log_ratio": 0.0003637215800154081,
+      "minimum_peak_offset": 0,
+      "predicted_bottleneck_passed": 21,
+      "q05_log_ratio": -0.03185844924837042,
+      "q95_log_ratio": 0.5029958889859067,
+      "rank": 44,
+      "sd_log_ratio": 0.4376678385658643,
+      "sweep_mean_log_ratio_sd": 0.13389719277050907,
+      "sweep_mean_log_ratio_se": 0.02921876291490246,
+      "terminal_statuses": "{\"ok\": 21, \"solution_cap\": 1, \"time_cap\": 2}"
+    }
+  ],
+  "regime_counts_on_complete_ranks": {
+    "long_plateau": 10,
+    "no_plateau": 56,
+    "transition": 6
+  },
+  "terminal_statuses": {
+    "ok": 93,
+    "solution_cap": 1,
+    "time_cap": 2
+  }
+}
