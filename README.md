@@ -3,7 +3,7 @@
 Artifact for the paper *Cumulative Gram–Schmidt profiles for lattice
 enumeration and sieving in projected lattices*.
 
-Everything reported in the paper is reproducible from the stored profiles in
+Everything reported in the paper is reproducible from the stored data in
 this repository. No number in the paper was entered by hand. Every table and
 figure is emitted by a script here.
 
@@ -77,9 +77,9 @@ unrestricted optimum.
 | `metadata.json`, `fixed_radius_metadata.json` | Software versions and run parameters. |
 | `tables/`, `figures/` | Generated output, included by the manuscript. |
 
-Failed and incomplete runs are kept in the data rather than dropped. Dropping
-them would bias the grid toward the numerically well-conditioned parameters.
-The statistics in the paper use completed sweeps only, and every exclusion is
+Failed and incomplete runs are kept in the data rather than dropped. Keeping
+them makes the completion pattern visible and prevents their silent omission.
+The statistics in the paper use completed runs only, and every exclusion is
 visible in the tables.
 
 ## Notes on reproducibility
@@ -87,8 +87,8 @@ visible in the tables.
 Seeds are recorded with every profile, and the generator is deterministic
 given a seed, so any stored profile can be rebuilt exactly.
 
-FPLLL can abort at the C level on nearly flat profiles, which no Python
-handler can catch. Each job therefore runs in an isolated subprocess with a
-timeout, and a crash is recorded as a failed row. This is why 38 of the 1200
-reductions carry a failure status, all in three cells where the modulus is
-largest relative to the rank.
+FPLLL can abort at the C level, which no Python handler can catch. Each job
+therefore runs in an isolated subprocess with a timeout, and a crash is
+recorded as a failed row. This is why 38 of the 1200 reductions carry a
+failure status. They fall in seven parameter cells across three rank and
+modulus groups. The cause was not identified.

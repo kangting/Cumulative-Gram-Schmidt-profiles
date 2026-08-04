@@ -186,8 +186,9 @@ def fit_zgsa(ell: list[float], log_q: float) -> tuple[list[float], int, int]:
                 continue
             step = (n * log_q - log_det) / weight
             # The feasible class of Definition def:qary-zgsa requires a
-            # descent rate that is nonnegative and a tail height in [0, Q).
-            if step < 0 or log_q - slope_len * step < 0:
+            # positive descent rate and a tail height in [0, Q). A positive
+            # rate with a nonnegative slope length also forces H < Q.
+            if step <= 0 or log_q - slope_len * step < 0:
                 continue
             model = zgsa_profile(n, plateau, slope_len, log_q, step)
             delta = discrepancy(ell, model)
@@ -234,7 +235,7 @@ def fit_zgsa_by(ell: list[float], log_q: float, objective):
             if weight <= 0:
                 continue
             step = (n * log_q - log_det) / weight
-            if step < 0 or log_q - slope_len * step < 0:
+            if step <= 0 or log_q - slope_len * step < 0:
                 continue
             model = zgsa_profile(n, plateau, slope_len, log_q, step)
             score = objective(ell, model)
@@ -413,6 +414,105 @@ def plateau_length(ell: list[float], log_q: float) -> int:
     return sum(1 for value in ell if value > log_q - PLATEAU_TOLERANCE)
 
 
+def write_tgsa_blocksize_table(records: list[dict]) -> None:
+    """Report model accuracy separately for beta=2 and beta in {20, 40}."""
+    model_names = ("GSA", "TGSA", "ZGSA")
+    blocksize_groups = (
+        ("beta=2", r"$\beta=2$", (2,)),
+        ("beta in {20,40}", r"$\beta\in\{20,40\}$", (20, 40)),
+    )
+
+    def mean(values: list[float]) -> float:
+        return sum(values) / len(values)
+
+    summaries: dict[str, dict[str, tuple[float, float, float]]] = {}
+    for group_name, _, block_sizes in blocksize_groups:
+        summaries[group_name] = {}
+        for model_name in model_names:
+            subset = [
+                record for record in records
+                if record["model"] == model_name
+                and record["beta"] in block_sizes
+            ]
+            summaries[group_name][model_name] = (
+                mean([record["delta"] for record in subset]),
+                mean([
+                    abs(record["true_d"] - record["model_d"])
+                    for record in subset
+                ]),
+                mean([
+                    abs(record["true_k"] - record["model_k"])
+                    for record in subset
+                ]),
+            )
+
+    body = []
+    for model_name in model_names:
+        cells = []
+        for group_name, _, _ in blocksize_groups:
+            cells.extend(summaries[group_name][model_name])
+        body.append(
+            f"  {model_name} & "
+            + " & ".join(f"${value:.2f}$" for value in cells)
+            + r" \\"
+        )
+    group_headers = " & ".join(
+        rf"\multicolumn{{3}}{{c}}{{{latex_label}}}"
+        for _, latex_label, _ in blocksize_groups
+    )
+    write_tabular(
+        TABLE_DIR / "tgsa_blocksize.tex",
+        "@{}lrrrrrr@{}",
+        "Model & " + group_headers + r" \\" + "\n"
+        r"  \cmidrule(lr){2-4} \cmidrule(l){5-7}" + "\n"
+        r"  & mean $\Delta_{\rm E}$ & mean $|\Delta d_{\max}|$ & "
+        r"mean $|\Delta k^*|$ & mean $\Delta_{\rm E}$ & "
+        r"mean $|\Delta d_{\max}|$ & mean $|\Delta k^*|$",
+        body,
+    )
+
+    print("\nTGSA block-size split over completed profiles")
+    for model_name in model_names:
+        for group_name, _, _ in blocksize_groups:
+            delta, d_error, k_error = summaries[group_name][model_name]
+            print(
+                f"  {model_name:<6} {group_name:<16} "
+                f"mean Delta_E={delta:.2f}  "
+                f"mean |true_d-model_d|={d_error:.2f}  "
+                f"mean |true_k-model_k|={k_error:.2f}"
+            )
+
+    print("\nTGSA/ZGSA mean Delta_E ratios")
+    for group_name, _, _ in blocksize_groups:
+        ratio = (
+            summaries[group_name]["TGSA"][0]
+            / summaries[group_name]["ZGSA"][0]
+        )
+        print(f"  {group_name}: {ratio:.17g}")
+
+    cell_deltas: dict[tuple[int, int, int, int], dict[str, list[float]]] = {}
+    for record in records:
+        if record["beta"] not in (20, 40):
+            continue
+        key = (record["n"], record["q"], record["t"], record["beta"])
+        cell_deltas.setdefault(key, {}).setdefault(record["model"], []).append(
+            record["delta"]
+        )
+    cell_ratios = [
+        (
+            mean(by_model["TGSA"]) / mean(by_model["ZGSA"]),
+            key,
+        )
+        for key, by_model in cell_deltas.items()
+    ]
+    max_ratio, max_key = max(cell_ratios)
+    print(
+        "  maximum per-cell TGSA/ZGSA Delta_E ratio for beta in {20,40}: "
+        f"{max_ratio:.17g} "
+        f"(n={max_key[0]}, q={max_key[1]}, t={max_key[2]}, beta={max_key[3]})"
+    )
+
+
 def analyze() -> None:
     if not PROFILE_PATH.exists():
         sys.exit("no data, run the reduce subcommand first")
@@ -584,6 +684,7 @@ def analyze() -> None:
         r"mean cost error & mean error$/\Delta_{\rm E}$",
         prediction_lines,
     )
+    write_tgsa_blocksize_table(records)
 
     # Table for Section 6.2: one row per parameter cell, seed-averaged, giving
     # the regime, the fitted head length, the two predictions and the width of
