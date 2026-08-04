@@ -4,8 +4,9 @@ Artifact for the paper *Cumulative Gram–Schmidt profiles for lattice
 enumeration and sieving in projected lattices*.
 
 Everything reported in the paper is reproducible from the stored data in
-this repository. No number in the paper was entered by hand. Every table and
-figure is emitted by a script here.
+this repository. Every data-derived table and figure is emitted by a script
+here, and no reported number was entered by hand. Expository diagrams and
+notation tables are maintained in the manuscript source.
 
 ## Requirements
 
