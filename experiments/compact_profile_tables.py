@@ -201,9 +201,12 @@ def render_families(records: Sequence[JsonRecord]) -> None:
         true_d = mean([int(record["true_d"]) for record in zgsa])
         gsa_delta = model_mean(key, "GSA")
         zgsa_delta = model_mean(key, "ZGSA")
+        # Rows with GH/q > 1 are Gaussian-radius proxy values only and are
+        # inconsistent with a shortest-vector target at zero deficit.
+        marker = r"^{\diamond}" if gh_over_q > 1.0 else ""
         body.append(
             f"  ${rank}$ & ${modulus}$ & ${lattice_t}$ & ${beta}$ & "
-            f"${gh_over_q:.3f}$ & ${head:.0f}$ & ${true_k:.0f}$ & "
+            f"${gh_over_q:.3f}{marker}$ & ${head:.0f}$ & ${true_k:.0f}$ & "
             f"${true_d:.0f}$ & {selection} & "
             f"${gsa_delta:.2f}/{zgsa_delta:.2f}$" + r" \\"
         )

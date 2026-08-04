@@ -686,46 +686,8 @@ def analyze() -> None:
     )
     write_tgsa_blocksize_table(records)
 
-    # Table for Section 6.2: one row per parameter cell, seed-averaged, giving
-    # the regime, the fitted head length, the two predictions and the width of
-    # the certified interval implied by Delta_E.
-    family_lines = []
-    representative_keys = [
-        key
-        for key in sorted(groups)
-        if key[2] == (3 * key[0]) // 4 and key[3] == 20
-    ]
-    for key in representative_keys:
-        n, q, t, beta = key
-        cell = [r for r in records if (r["n"], r["q"], r["t"], r["beta"]) == key]
-        zgsa = [r for r in cell if r["model"] == "ZGSA"]
-        best = min(("GSA", "TGSA", "ZGSA"),
-                   key=lambda m: sum(r["delta"] for r in cell if r["model"] == m))
-        mean = lambda vals: sum(vals) / len(vals)
-        gh_over_q = math.exp(
-            log_gh(n) + mean([r["alpha"] for r in zgsa]) * math.log(q) - math.log(q)
-        )
-        head = mean([r["fitted_plateau"] for r in zgsa])
-        true_k = mean([r["true_k"] for r in zgsa])
-        true_d = mean([r["true_d"] for r in zgsa])
-        width = mean([r["delta"] for r in cell if r["model"] == best])
-        # Rows with GH/q > 1 are Gaussian-radius proxy values only and are
-        # inconsistent with a shortest-vector target at zero deficit.
-        marker = r"^{\diamond}" if gh_over_q > 1.0 else ""
-        family_lines.append(
-            f"  ${n}$ & ${q}$ & ${mean([r['alpha'] for r in zgsa]):.2f}$ & ${beta}$ & "
-            f"${gh_over_q:.3f}{marker}$ & ${head:.0f}$ & ${true_k:.0f}$ & "
-            f"${true_d:.0f}$ & "
-            f"{best} & ${width:.2f}$" + r" \\"
-        )
-    write_tabular(
-        TABLE_DIR / "families.tex",
-        "@{}rrrrrrrrlr@{}",
-        r"$n$ & $q$ & $\alpha$ & $\beta$ & $\GH/q$ & head & $k^*$ & "
-        r"$d_{\max}$ & model & $\Delta_{\rm E}$",
-        family_lines,
-    )
-
+    # The Section 6 family table is emitted by compact_profile_tables, which
+    # owns the selection rule and the row format.
     from compact_profile_tables import render as render_compact_tables
 
     render_compact_tables()
