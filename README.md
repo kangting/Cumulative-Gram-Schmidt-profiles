@@ -14,11 +14,14 @@ python >= 3.12
 fpylll == 0.6.4
 numpy
 scipy
+matplotlib
 ```
 
 `fpylll` is only needed to regenerate lattices and to run reductions or point
-counts. The verification scripts and the table generators run on the stored
-data with numpy and scipy alone.
+counts. Every script imports it lazily, so the rest of the pipeline runs
+without it. The table generators and most verification scripts need only the
+standard library. `extremal_check.py` needs numpy and scipy, and the figure
+script needs matplotlib.
 
 ## Reproducing the paper
 
@@ -29,7 +32,8 @@ Run in this order. Steps 1 and 3 are the expensive ones.
 #    About 16 CPU-hours, roughly 45 minutes on 24 workers.
 python experiments/bkz_experiment.py reduce --seeds 10
 
-# 2. Fit the profile models and emit the discrepancy and family tables.
+# 2. Fit the profile models and emit the discrepancy, family and
+#    block-size tables.
 python experiments/bkz_experiment.py analyze
 
 # 3. Fixed-radius projected point counts at ranks 40 and 44.
@@ -57,7 +61,7 @@ pass.
 python experiments/verify_identities.py         # every identity of Section 3
 python experiments/verify_models.py             # the ZGSA closed forms
 python experiments/exact_extremal_certificate.py # Proposition 3.5, exact rationals
-python experiments/extremal_check.py            # the 96-cell linear programme
+python experiments/extremal_check.py            # 96 parameter choices, by LP
 ```
 
 `exact_extremal_certificate.py` is the computer-assisted part of
@@ -78,7 +82,8 @@ unrestricted optimum.
 | `tables/`, `figures/` | Generated output, included by the manuscript. |
 
 Failed and incomplete runs are kept in the data rather than dropped. Keeping
-them makes the completion pattern visible and prevents their silent omission.
+them makes the potential completion bias explicit and prevents their silent
+omission.
 The statistics in the paper use completed runs only, and every exclusion is
 visible in the tables.
 
