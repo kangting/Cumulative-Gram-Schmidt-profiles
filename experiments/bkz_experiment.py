@@ -148,7 +148,10 @@ def fit_tgsa(ell: list[float], block_size: int) -> list[float]:
     beta = min(max(block_size, 2), n)
     head_len = n - beta
     tail = hkz_shape_tail(beta)
-    slope = 2.0 * log_gh(beta) / (beta - 1) if beta > 2 else 0.0
+    # Definition of the tail-adapted model. The decrement is nonpositive for
+    # beta <= 12, where the modeled head rises. Section 5 reports those cells
+    # separately as a formal extrapolation outside the intended regime.
+    slope = 2.0 * log_gh(beta) / (beta - 1)
     head = [-slope * i for i in range(head_len)]
     offset = (head[-1] - slope if head else 0.0) - tail[0]
     model = head + [value + offset for value in tail]
@@ -411,7 +414,18 @@ def write_tabular(path: pathlib.Path, spec: str, header: str,
 # ------------------------------------------------------------------ analyze
 
 def plateau_length(ell: list[float], log_q: float) -> int:
-    return sum(1 for value in ell if value > log_q - PLATEAU_TOLERANCE)
+    """Length of the leading run of entries within PLATEAU_TOLERANCE of log q.
+
+    This is the q-plateau of the three-zone model. Counting every entry near
+    log q instead, without requiring a leading run, changes the grid mean by
+    under two entries and is available from the stored profiles.
+    """
+    length = 0
+    for value in ell:
+        if abs(value - log_q) > PLATEAU_TOLERANCE:
+            break
+        length += 1
+    return length
 
 
 def write_tgsa_blocksize_table(records: list[dict]) -> None:
@@ -616,51 +630,32 @@ def analyze() -> None:
             f"  ${n}$ & ${q}$ & ${t}$ & ${beta}$ & ${plateau:.0f}$ & "
             + " & ".join(f"${m:.2f}\\pm{s:.2f}$" for m, s in cells) + r" \\"
         )
-    compact_lines = []
-    rank_modulus_keys = sorted(
-        {(record["n"], record["q"]) for record in records}
-    )
-    for n, q in rank_modulus_keys:
-        subset = [
-            record
-            for record in records
-            if (record["n"], record["q"]) == (n, q)
-        ]
-        available_cells = {
-            (record["t"], record["beta"]) for record in subset
-        }
-        plateaus = [
-            record["plateau"]
-            for record in subset
-            if record["model"] == "GSA"
-        ]
-        model_cells = []
-        for model in ("GSA", "TGSA", "ZGSA"):
-            values = [
-                record["delta"]
-                for record in subset
-                if record["model"] == model
-            ]
-            value_mean = sum(values) / len(values)
-            variance = sum(
-                (value - value_mean) ** 2 for value in values
-            ) / max(len(values) - 1, 1)
-            model_cells.append((value_mean, variance ** 0.5))
-        compact_lines.append(
-            f"  ${n}$ & ${q}$ & ${len(available_cells)}$ & "
-            f"${sum(plateaus) / len(plateaus):.0f}$ & "
-            + " & ".join(
-                f"${value_mean:.2f}\\pm{spread:.2f}$"
-                for value_mean, spread in model_cells
-            )
-            + r" \\"
-        )
-    write_tabular(
-        TABLE_DIR / "discrepancy.tex",
-        "@{}rrrrrrr@{}",
-        r"$n$ & $q$ & cells & plateau & GSA & TGSA & ZGSA",
-        compact_lines,
-    )
+    # The Section 5 discrepancy tables are emitted by
+    # compact_profile_tables, which owns their row format.
+
+    # Section 5 reports the plateau size of the cells the three-zone model wins
+    # against the cells it loses to the geometric model.
+    cell_delta: dict[tuple, dict[str, list[float]]] = {}
+    cell_plateau: dict[tuple, list[int]] = {}
+    for r in records:
+        key = (r["n"], r["q"], r["t"], r["beta"])
+        cell_delta.setdefault(key, {}).setdefault(r["model"], []).append(r["delta"])
+        cell_plateau.setdefault(key, []).append(r["plateau"])
+    won, lost = [], []
+    for key, by_model in cell_delta.items():
+        if not {"GSA", "TGSA", "ZGSA"} <= set(by_model):
+            continue
+        means = {m: sum(v) / len(v) for m, v in by_model.items()}
+        plateau = sum(cell_plateau[key]) / len(cell_plateau[key])
+        if means["ZGSA"] == min(means.values()):
+            won.append(plateau)
+        elif means["GSA"] == min(means.values()):
+            lost.append(plateau)
+    print(f"\nthree-zone wins {len(won)} of {len(cell_delta)} cells with data")
+    if won:
+        print(f"  mean plateau in cells it wins  {sum(won) / len(won):6.1f}")
+    if lost:
+        print(f"  mean plateau in cells it loses {sum(lost) / len(lost):6.1f}")
 
     print("\nprediction accuracy by model")
     prediction_lines = []

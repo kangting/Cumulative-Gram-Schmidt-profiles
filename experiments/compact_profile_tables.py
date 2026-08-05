@@ -102,6 +102,7 @@ def cell_key(record: JsonRecord) -> CellKey:
 def render_discrepancy(records: Sequence[JsonRecord]) -> None:
     """Render raw and normalized rank-and-modulus discrepancy rows."""
     body: list[str] = []
+    normalized_body: list[str] = []
     rank_modulus_keys = sorted(
         {(int(record["n"]), int(record["q"])) for record in records}
     )
@@ -134,22 +135,35 @@ def render_discrepancy(records: Sequence[JsonRecord]) -> None:
                     sample_standard_deviation(normalized),
                 )
             )
-        body.append(
+        prefix = (
             f"  ${rank}$ & ${modulus}$ & ${len(available_cells)}$ & "
             f"${mean(plateaus):.0f}$ & "
+        )
+        body.append(
+            prefix
             + " & ".join(
-                f"$\\substack{{{value_mean:.2f}\\mathbin{{\\pm}}{spread:.2f}"
-                f"\\\\{normalized_mean:.4f}\\mathbin{{\\pm}}{normalized_spread:.4f}}}$"
-                for value_mean, spread, normalized_mean, normalized_spread
-                in model_statistics
+                f"${value_mean:.2f}\\mathbin{{\\pm}}{spread:.2f}$"
+                for value_mean, spread, _, _ in model_statistics
             )
             + r" \\"
         )
+        normalized_body.append(
+            prefix
+            + " & ".join(
+                f"${normalized_mean:.4f}\\mathbin{{\\pm}}{normalized_spread:.4f}$"
+                for _, _, normalized_mean, normalized_spread in model_statistics
+            )
+            + r" \\"
+        )
+    header = r"$n$ & $q$ & cells & plateau & GSA & TGSA & ZGSA"
     write_tabular(
-        TABLE_DIR / "discrepancy.tex",
+        TABLE_DIR / "discrepancy_raw.tex", "@{}rrrrrrr@{}", header, body
+    )
+    write_tabular(
+        TABLE_DIR / "discrepancy_normalized.tex",
         "@{}rrrrrrr@{}",
-        r"$n$ & $q$ & cells & plateau & GSA & TGSA & ZGSA",
-        body,
+        header,
+        normalized_body,
     )
 
 

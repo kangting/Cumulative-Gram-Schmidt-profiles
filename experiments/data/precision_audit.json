@@ -1,0 +1,10 @@
+{
+  "profiles": 1162,
+  "max_abs_cumulative_gap_ordinary_vs_exact": 5.9401372709544376e-12,
+  "bottleneck_changed_by_compensated_sum": 0,
+  "bottleneck_changed_by_exact_sum": 0,
+  "depth_changed_by_compensated_sum": 0,
+  "depth_changed_by_exact_sum": 0,
+  "min_admissibility_margin_at_crossing": 2.2130585288465676e-05,
+  "scope": "summation and post-processing only, not the stored profile entries"
+}

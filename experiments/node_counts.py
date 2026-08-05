@@ -259,10 +259,13 @@ def enumerate_job(
     predicted_k, predicted_peak = predicted_bottleneck(profile)
     log_radius = log_gh_from_profile(profile)
     radius_squared = math.exp(2.0 * log_radius)
-    plateau_length = sum(
-        value > math.log(int(common["q"])) - PLATEAU_TOLERANCE
-        for value in profile
-    )
+    # Same convention as bkz_experiment.plateau_length: the leading run of
+    # entries within PLATEAU_TOLERANCE of log q.
+    plateau_length = 0
+    for value in profile:
+        if abs(value - math.log(int(common["q"]))) > PLATEAU_TOLERANCE:
+            break
+        plateau_length += 1
     emit_profile(
         {
             **common,
