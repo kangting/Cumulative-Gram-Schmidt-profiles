@@ -17,6 +17,11 @@ from bkz_experiment import cumulative, discrepancy, fit_gsa, fit_zgsa
 
 DATA_DIR = pathlib.Path(__file__).resolve().parent / "data"
 FIGURE_DIR = DATA_DIR / "figures"
+
+# Matplotlib stamps a creation date into every PDF. Suppressing it keeps
+# the figures byte-identical across runs, so regenerating and diffing is a
+# meaningful reproducibility check.
+PDF_METADATA = {"CreationDate": None}
 PROFILE_PATH = DATA_DIR / "profiles.jsonl"
 RESULTS_PATH = DATA_DIR / "results.csv"
 COUNT_PATH = DATA_DIR / "fixed_radius_counts.csv"
@@ -143,7 +148,8 @@ def plot_profile_panels(
     handles, labels = axes[0, 0].get_legend_handles_labels()
     figure.legend(handles, labels, loc="upper center", ncol=3, frameon=False)
     figure.tight_layout(rect=(0, 0, 1, 0.94))
-    figure.savefig(FIGURE_DIR / "profile_fits.pdf", bbox_inches="tight")
+    figure.savefig(FIGURE_DIR / "profile_fits.pdf", bbox_inches="tight",
+               metadata=PDF_METADATA)
     plt.close(figure)
     return metadata
 
@@ -216,7 +222,8 @@ def plot_fixed_radius_panels() -> list[JsonRecord]:
     handles, labels = axes[0].get_legend_handles_labels()
     figure.legend(handles, labels, loc="upper center", ncol=2, frameon=False)
     figure.tight_layout(rect=(0, 0, 1, 0.9))
-    figure.savefig(FIGURE_DIR / "fixed_radius_peaks.pdf", bbox_inches="tight")
+    figure.savefig(FIGURE_DIR / "fixed_radius_peaks.pdf", bbox_inches="tight",
+               metadata=PDF_METADATA)
     plt.close(figure)
     return metadata
 

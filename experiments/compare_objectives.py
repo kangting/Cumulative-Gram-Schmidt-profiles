@@ -4,12 +4,14 @@ This is the experiment that tests the paper's methodological claim directly.
 Both fits use the same model classes and the same determinant constraint, so
 the only difference is which criterion selects the parameters.
 """
-import json, math, sys
+import json
+import pathlib, math, sys
 sys.path.insert(0, "experiments")
 from bkz_experiment import (cumulative, discrepancy, rmse, fit_gsa_by,
                             fit_zgsa_by, bottleneck, admissible_depth)
 
-rows = [json.loads(l) for l in open("experiments/data/profiles.jsonl") if l.strip()]
+DATA_DIR = pathlib.Path(__file__).resolve().parent / "data"
+rows = [json.loads(l) for l in (DATA_DIR / "profiles.jsonl").open() if l.strip()]
 # Failed reductions carry no profile and are excluded here, as in analyze.
 rows = [r for r in rows if r.get("status", "ok") == "ok"]
 # One seed per cell keeps the O(n^3) ZGSA search affordable.
@@ -57,9 +59,9 @@ for (name, obj) in sorted(agg):
         f"${mean(a['rmse']):.3f}$ & ${mean(a['dk']):.2f}$ & "
         f"${mean(a['dd']):.2f}$ & ${mean(a['dc']):.2f}$" + r" \\"
     )
-open("experiments/data/tables/objective.tex", "w").write(
+(DATA_DIR / "tables" / "objective.tex").open("w").write(
     "\\begin{tabular}{@{}llrrrrr@{}}\n  \\toprule\n"
     "  Model & Fitted by & $\\Delta_{\\rm E}$ & RMSE & mean $|\\Delta k^*|$ & "
     "mean $|\\Delta d_{\\max}|$ & mean cost error \\\\\n  \\midrule\n"
     + "\n".join(lines) + "\n  \\bottomrule\n\\end{tabular}\n")
-print("\nwrote experiments/data/tables/objective.tex")
+print(f"\nwrote {DATA_DIR / 'tables' / 'objective.tex'}")

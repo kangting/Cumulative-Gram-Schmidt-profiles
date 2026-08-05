@@ -239,7 +239,8 @@ def render() -> None:
     records = load_records()
     render_discrepancy(records)
     render_families(records)
-    print(f"wrote {TABLE_DIR / 'discrepancy.tex'}")
+    print(f"wrote {TABLE_DIR / 'discrepancy_raw.tex'}")
+    print(f"wrote {TABLE_DIR / 'discrepancy_normalized.tex'}")
     print(f"wrote {TABLE_DIR / 'families.tex'}")
 
 
