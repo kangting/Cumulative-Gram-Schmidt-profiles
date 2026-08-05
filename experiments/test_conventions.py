@@ -32,6 +32,37 @@ def test_tgsa_head_rises_at_block_size_two() -> None:
     assert head[1] > head[0], "beta = 2 must extrapolate to a rising head"
 
 
+def test_hkz_tail_satisfies_the_shape_heuristic() -> None:
+    """Each suffix head equals gh of the suffix rank times the suffix mean."""
+    for beta in (2, 3, 5, 12, 13, 20, 40):
+        tail = bx.hkz_shape_tail(beta)
+        assert abs(sum(tail)) < 1e-12, f"beta={beta} tail is not determinant one"
+        for m in range(2, beta + 1):
+            suffix = tail[beta - m:]
+            expected = bx.log_gh(m) + sum(suffix) / m
+            assert abs(tail[beta - m] - expected) < 1e-12, f"beta={beta} m={m}"
+
+
+def test_tgsa_cumulative_path_matches_the_finite_formula() -> None:
+    """The fitted model reproduces the closed form of the manuscript."""
+    for n, beta in ((30, 2), (50, 13), (60, 20), (80, 40)):
+        ell = [10.0 - 0.1 * i for i in range(n)]
+        cumulative = bx.cumulative(bx.fit_tgsa(ell, beta))
+        eta = 2.0 * bx.log_gh(beta) / (beta - 1)
+        head_len = n - beta
+        for j in range(n + 1):
+            if j <= head_len:
+                expected = eta / 2.0 * j * (n - j)
+            elif j < n:
+                k = n - j
+                expected = k * head_len * eta / 2.0 + k * sum(
+                    bx.log_gh(v) / (v - 1) for v in range(k + 1, beta + 1)
+                )
+            else:
+                expected = 0.0
+            assert abs(cumulative[j] - expected) < 1e-9, f"n={n} beta={beta} j={j}"
+
+
 def test_plateau_is_a_leading_run_within_tolerance() -> None:
     q = math.log(97.0)
     tol = bx.PLATEAU_TOLERANCE

@@ -128,17 +128,25 @@ def fit_gsa(ell: list[float]) -> list[float]:
 
 
 def hkz_shape_tail(length: int) -> list[float]:
-    """Determinant-one HKZ-shaped profile of the given rank."""
+    """Determinant-one profile satisfying the HKZ shape heuristic.
+
+    Writing g_m = log gh(m) and T_m for the mean of the last m entries, the
+    heuristic says L_{length-m+1} = g_m + T_m. Rearranging gives the suffix
+    recurrence T_m = T_{m-1} + g_m / (m - 1), and determinant one fixes
+    T_length = 0. The entries follow from the two relations.
+    """
     if length <= 1:
         return [0.0] * max(length, 0)
+    increments = [log_gh(m) / (m - 1) for m in range(2, length + 1)]
+    suffix_mean = [0.0] * (length + 1)
+    suffix_mean[1] = -sum(increments)
+    for m in range(2, length + 1):
+        suffix_mean[m] = suffix_mean[m - 1] + increments[m - 2]
     tail = [0.0] * length
-    running = 0.0
-    for index in range(length - 1, 0, -1):
-        rank = length - index + 1
-        running += log_gh(rank) / (rank - 1)
-        tail[index - 1] = running
-    mean = sum(tail) / length
-    return [value - mean for value in tail]
+    tail[length - 1] = suffix_mean[1]
+    for m in range(2, length + 1):
+        tail[length - m] = log_gh(m) + suffix_mean[m]
+    return tail
 
 
 def fit_tgsa(ell: list[float], block_size: int) -> list[float]:
