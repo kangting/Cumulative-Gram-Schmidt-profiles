@@ -81,10 +81,10 @@ python experiments/exact_extremal_certificate.py # Proposition 3.5, exact ration
 python experiments/extremal_check.py            # 96 parameter choices, by LP
 ```
 
-`exact_extremal_certificate.py` is the computer-assisted part of
-Proposition 3.5. It enumerates all 780 descent intervals in exact rational
-arithmetic and confirms that no common-slope three-zone profile reaches the
-unrestricted optimum.
+`exact_extremal_certificate.py` independently checks Proposition 3.5. The
+paper proves it, and the script confirms the primal and dual values and the
+three-zone maximum by enumerating all 780 descent intervals in exact
+rational arithmetic.
 
 ## Data
 
