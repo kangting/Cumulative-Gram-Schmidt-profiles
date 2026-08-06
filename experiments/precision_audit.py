@@ -23,6 +23,21 @@ import bkz_experiment as bx
 DATA_DIR = pathlib.Path(__file__).resolve().parent / "data"
 PROFILE_PATH = DATA_DIR / "profiles.jsonl"
 OUTPUT = DATA_DIR / "precision_audit.json"
+MACROS = DATA_DIR / "tables" / "precision_audit.tex"
+
+
+def latex_power(value: float, *, round_up: bool) -> str:
+    """One significant digit in LaTeX scientific notation.
+
+    An upper bound is rounded up and a lower bound is rounded down, so the
+    displayed figure is never more favourable than the measurement.
+    """
+    exponent = math.floor(math.log10(value))
+    scaled = value / 10.0 ** exponent
+    mantissa = math.ceil(scaled) if round_up else math.floor(scaled)
+    if mantissa == 10:
+        mantissa, exponent = 1, exponent + 1
+    return f"{mantissa}\\times10^{{{exponent}}}"
 
 
 def cumulative_exact(ell: list[float]) -> list[Fraction]:
@@ -99,8 +114,14 @@ def main() -> None:
         "scope": "summation and post-processing only, not the stored profile entries",
     }
     OUTPUT.write_text(json.dumps(result, indent=2) + "\n")
+    MACROS.write_text(
+        "\\newcommand{\\AuditedProfiles}{%d}\n" % len(rows)
+        + "\\newcommand{\\MaxCumulativeRoundingGap}{%s}\n" % latex_power(max_c_gap, round_up=True)
+        + "\\newcommand{\\MinAdmissibilityMargin}{%s}\n" % latex_power(min_margin, round_up=False)
+    )
     for key, value in result.items():
         print(f"  {key}: {value}")
+    print(f"wrote {MACROS}")
 
 
 if __name__ == "__main__":

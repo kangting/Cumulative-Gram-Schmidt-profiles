@@ -4,9 +4,10 @@ Artifact for the paper *Cumulative Gram–Schmidt profiles for lattice
 enumeration and sieving in projected lattices*.
 
 Everything reported in the paper is reproducible from the stored data in
-this repository. Every data-derived table and figure is emitted by a script
-here, and no reported number was entered by hand. Expository diagrams and
-notation tables are maintained in the manuscript source.
+this repository. Every data-derived table, figure and reported figure is
+emitted by a script here, the last of these as LaTeX macros the manuscript
+includes. Expository diagrams and notation tables are maintained in the
+manuscript source.
 
 ## Requirements
 
@@ -33,7 +34,6 @@ result should match what is committed here.
 python experiments/regenerate_all.py
 git diff --exit-code            # no output means the committed output matches
 python experiments/test_conventions.py
-python experiments/precision_audit.py
 ```
 
 `test_conventions.py` checks the two model conventions the manuscript states

@@ -16,6 +16,7 @@ STEPS = [
     ("point-count table", ["node_count_reporting.py"]),
     ("fitting-objective comparison", ["compare_objectives.py"]),
     ("figures", ["generate_revision_figures.py"]),
+    ("summation precision audit", ["precision_audit.py"]),
 ]
 
 
